@@ -64,7 +64,9 @@ export default function HomePage() {
       <main className="page-content">
         {/* NAVBAR */}
         <nav className="navbar">
-          <span className="logo">AI Interview</span>
+          <span className="logo">
+          <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
+            AI Interview</span>
 
           <div className="nav-center">
             <button className="nav-link" onClick={() => scrollTo("features")}>
@@ -204,7 +206,9 @@ export default function HomePage() {
         <footer className="footer">
           <div className="footer-inner">
             <div className="footer-brand">
-              <h3>AI Interview</h3>
+              <span>
+              <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
+                AI Interview</span>
               <p>
                 Practice interviews. Get real feedback.
                 <br />
