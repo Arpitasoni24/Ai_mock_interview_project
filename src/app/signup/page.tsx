@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import Image from "next/image";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -45,6 +45,11 @@ export default function SignupPage() {
   return (
     <div className="signup-wrapper">
       <div className="signup-card">
+        <span className="logo">
+              <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
+              <span>InterviewGuide</span>
+            </span>
+            <br />
         <h1 className="signup-title">Create your account</h1>
         <p className="signup-subtitle">
           Start practicing interviews with AI feedback
@@ -86,7 +91,7 @@ export default function SignupPage() {
             />
           </label>
 
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="button-signup">
             {loading ? "Creating account…" : "Create account"}
           </button>
         </form>

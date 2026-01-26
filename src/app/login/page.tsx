@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import Image from "next/image";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +38,11 @@ export default function LoginPage() {
   return (
     <div className="login-wrapper">
       <div className="login-card">
+        <span className="logo">
+              <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
+              <span>InterviewGuide</span>
+            </span>
+            <br />
         <h1 className="login-title">Welcome back</h1>
         <p className="login-subtitle">
           Practice interviews. Improve answers. Get confident.
@@ -68,7 +73,7 @@ export default function LoginPage() {
             />
           </label>
 
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} className="button-login">
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>

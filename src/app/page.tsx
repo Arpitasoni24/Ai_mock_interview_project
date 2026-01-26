@@ -53,6 +53,7 @@ export default function HomePage() {
   };
 
   return (
+    
     <div className="page-root">
       {/* ===== BACKGROUND ONLY ===== */}
       <div className="global-bg">
@@ -60,7 +61,9 @@ export default function HomePage() {
         <div className="light-ray ray-2" data-speed="0.6" />
         <div className="light-ray ray-3" data-speed="0.8" />
       </div>
-
+<head>
+  <title>InterviewGuide</title>
+</head>
       {/* ===== SCROLLABLE CONTENT ===== */}
       <main className="page-content">
         {/* NAVBAR */}
@@ -69,7 +72,7 @@ export default function HomePage() {
   <div className="nav-left">
     <span className="logo">
       <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
-      <span>AI Interview</span>
+      <span>InterviewGuide</span>
     </span>
   </div>
 
@@ -248,7 +251,7 @@ export default function HomePage() {
             <div className="footer-brand">
               <span>
               <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
-                AI Interview</span>
+                InterviewGuide</span>
               <p>
                 Practice interviews. Get real feedback.
                 <br />
@@ -257,7 +260,7 @@ export default function HomePage() {
             </div>
 
             <div className="footer-links">
-              <div>
+              <div style={{paddingBottom: '4px'}}>
                 <h4>Product</h4>
                 <button onClick={() => scrollTo("features")} className="nav-link">Features</button>
                 <br /> <br />
