@@ -1,4 +1,4 @@
-# AI Mock Interview Platform
+# InterviewGuide - AI Mock Interview Platform 
 
 An **AI-powered mock interview platform** that simulates real technical interviews, evaluates answers using LLMs, and provides **structured feedback, scoring, and performance analytics** — all inside a modern, immersive interface.
 
