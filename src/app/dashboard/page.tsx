@@ -403,7 +403,7 @@ const exportInterviewReport = (interview: Interview) => {
         <button
           onClick={handleLogout}
           style={{
-            background: "#ef4444",
+            background: "#000000",
             color: "white",
             padding: "8px 16px",
             borderRadius: "8px",
@@ -426,31 +426,20 @@ const exportInterviewReport = (interview: Interview) => {
         }}
       >
 
-        <div
+        <div className="stats-layout"
   style={{
-    display: "grid",
-    gridTemplateColumns: "380px 1fr",
-    gap: "32px",
-    alignItems: "stretch",
     marginBottom: "48px",
   }}
 >
   {/* LEFT — SCORE RINGS */}
-  <div
-    style={{
-      display: "flex",
-      gap: "32px",
-      alignItems: "center",
-      justifyContent: "center",
-      flexWrap: "wrap",
-    }}
+  <div className="rings"
   >
     <CircularProgress value={analytics.average} label="Average Score" />
     <CircularProgress value={analytics.best} label="Best Score" />
   </div>
 
   {/* RIGHT — PERFORMANCE GRAPH */}
-  <div className="glass-card" style={{ padding: "20px" }}>
+  <div className="glass-card graph" style={{ padding: "20px" }} >
     <h3 style={{ marginBottom: "12px" }}>
        Performance Trend
     </h3>
@@ -617,7 +606,7 @@ const exportInterviewReport = (interview: Interview) => {
               )
             }
           >
-            <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap" }}>
               <MiniScoreRing score={interview.score} />
 
               <div style={{ flex: 1 }}>

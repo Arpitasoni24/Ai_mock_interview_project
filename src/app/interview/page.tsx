@@ -451,7 +451,7 @@ setFinalScores((prev) => [...prev, aiData.score]);
     }}
   >
     <h2 style={{ fontSize: "24px", fontWeight: 700 }}>
-  Interview Complete 🎉
+  Interview Complete <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#17cf1a"><path d="M240-40v-329L110-580l185-300h370l185 300-130 211v329l-240-80-240 80Zm80-111 160-53 160 53v-129H320v129Zm20-649L204-580l136 220h280l136-220-136-220H340Zm98 383L296-558l57-57 85 85 169-170 57 56-226 227ZM320-280h320-320Z"/></svg>
 </h2>
 
 <p style={{ color: "#94a3b8", marginTop: "6px" }}>
@@ -464,7 +464,7 @@ setFinalScores((prev) => [...prev, aiData.score]);
     </p>
 
     <h3 style={{ marginTop: "20px" }}>
-      ⭐ Average Score:{" "}
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFF55"><path d="M480-644v236l96 74-36-122 90-64H518l-38-124ZM233-120l93-304L80-600h304l96-320 96 320h304L634-424l93 304-247-188-247 188Z"/></svg> Average Score:{" "}
       {(
         finalScores.reduce((a, b) => a + b, 0) /
         finalScores.length
@@ -477,14 +477,14 @@ setFinalScores((prev) => [...prev, aiData.score]);
         style={primaryBtn}
         onClick={() => (window.location.href = "/dashboard")}
       >
-        📊 Go to Dashboard
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg> Go to Dashboard
       </button>
 
       <button
         style={secondaryBtn}
         onClick={() => window.location.reload()}
       >
-        🔁 Start New Interview
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240v80H200v560h560v-240h80v240q0 33-23.5 56.5T760-120H200Zm440-400v-120H520v-80h120v-120h80v120h120v80H720v120h-80Z"/></svg> Start New Interview
       </button>
     </div>
   </div>
@@ -493,14 +493,6 @@ setFinalScores((prev) => [...prev, aiData.score]);
       {/* -------- INTERVIEW UI -------- */}
       {questions.length > 0 && !completed && (
         <div>
-          <p
-            style={{
-              fontWeight: "bold",
-              color: timeLeft <= 10 ? "red" : "black",
-            }}
-          >
-            ⏱️ Time Left: {timeLeft}s
-          </p>
 
           <p style={{ color: "#666" }}>
             Domain: <strong>{domain}</strong> | Level:{" "}
@@ -515,15 +507,15 @@ setFinalScores((prev) => [...prev, aiData.score]);
 }}>
   <div style={{ display: "flex", gap: "10px" }}>
     <button onClick={pauseInterview} style={secondaryBtn}>
-      ⏸ Pause
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M520-200v-560h240v560H520Zm-320 0v-560h240v560H200Zm400-80h80v-400h-80v400Zm-320 0h80v-400h-80v400Zm0-400v400-400Zm320 0v400-400Z"/></svg> Pause
     </button>
 
     <button onClick={resumeInterview} style={secondaryBtn}>
-      ▶ Resume
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M240-240v-480h80v480h-80Zm160 0 400-240-400-240v480Zm80-141v-198l165 99-165 99Zm0-99Z"/></svg> Resume
     </button>
 
     <button onClick={startListening} style={secondaryBtn}>
-      🎤 Speak
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm0-240Zm-40 520v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Zm40-360q17 0 28.5-11.5T520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480Z"/></svg>Speak
     </button>
     
   </div>
@@ -550,6 +542,7 @@ setFinalScores((prev) => [...prev, aiData.score]);
     const voices = window.speechSynthesis.getVoices();
     setVoice(voices[Number(e.target.value)]);
   }}
+  style={{backgroundColor: "transparent", color: "white"}}
 >
   {window.speechSynthesis.getVoices().map((v, i) => (
     <option key={i} value={i}>
@@ -588,7 +581,7 @@ setFinalScores((prev) => [...prev, aiData.score]);
     onClick={() => speakQuestion(currentQuestion)}
     style={{ ...secondaryBtn, marginTop: "12px" }}
   >
-    🔊 Read Question
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="m400-400 240-160-240-160v320ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg> Read Question
   </button>
 </div>
 </div>

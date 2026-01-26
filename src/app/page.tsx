@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {useRouter} from "next/navigation";
+import { useState } from "react";
 import Image from 'next/image';
 
 export default function HomePage() {
@@ -11,7 +12,7 @@ export default function HomePage() {
     window.history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
   }, []);
-
+  const [menuOpen, setMenuOpen] = useState(false);
   // Parallax light rays
   useEffect(() => {
     const rays = document.querySelectorAll<HTMLElement>(".light-ray");
@@ -38,7 +39,7 @@ export default function HomePage() {
   const handleStartInterview = async () => {
     try {
       const res = await fetch("/api/auth/me", {
-        credentials: "include", // VERY IMPORTANT
+        credentials: "include", 
       });
 
       if (res.ok) {
@@ -63,30 +64,69 @@ export default function HomePage() {
       {/* ===== SCROLLABLE CONTENT ===== */}
       <main className="page-content">
         {/* NAVBAR */}
-        <nav className="navbar">
-          <span className="logo">
-          <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
-            AI Interview</span>
+<nav className="navbar">
+  {/* LEFT */}
+  <div className="nav-left">
+    <span className="logo">
+      <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
+      <span>AI Interview</span>
+    </span>
+  </div>
 
-          <div className="nav-center">
-            <button className="nav-link" onClick={() => scrollTo("features")}>
-              Features
-            </button>
-            <button className="nav-link" onClick={() => scrollTo("how")}>
-              How It Works
-            </button>
-            <button className="nav-link" onClick={() => scrollTo("about")}>
-              About
-            </button>
-          <button
-      onClick={handleStartInterview}
-      className="cta"
-    >
+  {/* CENTER LINKS (DESKTOP ONLY) */}
+  <div className="nav-center">
+    <button className="nav-link" onClick={() => scrollTo("features")}>
+      Features
+    </button>
+    <button className="nav-link" onClick={() => scrollTo("how")}>
+      How It Works
+    </button>
+    <button className="nav-link" onClick={() => scrollTo("about")}>
+      About
+    </button>
+  </div>
+
+  {/* RIGHT */}
+  <div className="nav-right">
+    <button onClick={handleStartInterview} className="cta">
       Start Mock Interview
     </button>
-          </div>
 
-        </nav>
+    {/* HAMBURGER (MOBILE ONLY) */}
+    <button
+      className="hamburger"
+      onClick={() => setMenuOpen(!menuOpen)}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/></svg>
+    </button>
+  </div>
+
+  {/* BACKDROP */}
+{menuOpen && (
+  <div
+    className="drawer-backdrop"
+    onClick={() => setMenuOpen(false)}
+  />
+)}
+
+{/* SLIDE DRAWER */}
+<div className={`drawer ${menuOpen ? "open" : ""}`}>
+  <div className="drawer-header">
+    <span>Menu</span>
+    <button onClick={() => setMenuOpen(false)}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M560-280 360-480l200-200v400Z"/></svg></button>
+  </div>
+
+  <button onClick={() => { scrollTo("features"); setMenuOpen(false); }}>
+    Features
+  </button>
+  <button onClick={() => { scrollTo("how"); setMenuOpen(false); }}>
+    How It Works
+  </button>
+  <button onClick={() => { scrollTo("about"); setMenuOpen(false); }}>
+    About
+  </button>
+</div>
+</nav>
 
         {/* HERO SECTION */}
         <section className="hero-section">
