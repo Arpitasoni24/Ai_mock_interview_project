@@ -1,5 +1,17 @@
 import "./globals.css";
 import { Instrument_Sans } from "next/font/google";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI Mock Interview",
+  description: "Practice interviews with AI-powered feedback",
+  icons: {
+    icon: "/logo.png",          // browser tab
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+};
+
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
