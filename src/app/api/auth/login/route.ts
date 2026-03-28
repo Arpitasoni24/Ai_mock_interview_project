@@ -2,18 +2,22 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import  prisma  from "@/lib/prisma";
-
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export async function POST(req: Request) {
   try {
     let body;
     try {
       body = await req.json();
+console.log("BODY:", body);
     } catch {
+      
       return NextResponse.json(
         { error: "Request body must be valid JSON" },
         { status: 400 }
       );
     }
+    
 
     const { email, password } = body;
 

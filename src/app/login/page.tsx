@@ -19,7 +19,10 @@ export default function LoginPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+    email: email.trim(),
+    password: password.trim(),
+  }),
       });
 
       const data = await res.json();
