@@ -38,10 +38,10 @@ export default function LoginPage() {
         return;
       }
 
-      setTimeout(() => {
-  window.location.href = "/dashboard";
-}, 100);
-      // window.location.href = "/dashboard";
+//       setTimeout(() => {
+//   window.location.href = "/dashboard";
+// }, 100);
+      window.location.href = "/dashboard";
       // router.push("/dashboard");
     } catch (err) {
       console.error("FETCH ERROR:", err);
