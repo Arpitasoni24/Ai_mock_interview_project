@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     console.log("LOGIN CLICKED");
@@ -28,11 +30,13 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        console.log("LOGIN ERROR:", data); 
         setError(data.error || "Login failed");
         return;
       }
 
-      window.location.href = "/dashboard";
+      // window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch {
       setError("Something went wrong");
     } finally {
