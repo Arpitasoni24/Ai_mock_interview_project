@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
+    console.log("LOGIN CLICKED");
     e.preventDefault();
     setError("");
     setLoading(true);
