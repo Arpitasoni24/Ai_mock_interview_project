@@ -5,7 +5,9 @@ import  prisma  from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export async function POST(req: Request) {
+  
   try {
+    
     let body;
     try {
       body = await req.json();
@@ -78,7 +80,7 @@ console.log("BODY:", body);
     //   secure: process.env.NODE_ENV === "production",
     //   sameSite: "strict",
     httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "lax",  
       path: "/",
       maxAge: 60 * 60 * 24 * 7, // 7 days
