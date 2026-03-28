@@ -17,16 +17,19 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      
       const res = await fetch("/api/auth/login", {
+        
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
     email: email.trim(),
     password: password.trim(),
+    
   }),
       });
-
+      console.log("STATUS:", res.status);
       const data = await res.json();
 
       if (!res.ok) {
@@ -37,7 +40,8 @@ export default function LoginPage() {
 
       // window.location.href = "/dashboard";
       router.push("/dashboard");
-    } catch {
+    } catch (err) {
+      console.error("FETCH ERROR:", err);
       setError("Something went wrong");
     } finally {
       setLoading(false);

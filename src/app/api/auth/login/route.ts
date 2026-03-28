@@ -10,8 +10,8 @@ export async function POST(req: Request) {
     try {
       body = await req.json();
 console.log("BODY:", body);
-    } catch {
-      
+    } catch (err) {
+       console.error("JSON ERROR:", err);
       return NextResponse.json(
         { error: "Request body must be valid JSON" },
         { status: 400 }
