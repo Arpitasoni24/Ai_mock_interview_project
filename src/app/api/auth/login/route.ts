@@ -1,25 +1,25 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import  prisma  from "@/lib/prisma";
+import prisma from "@/lib/prisma";
+
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
 export async function POST(req: Request) {
-  
   try {
-    
     let body;
+
     try {
       body = await req.json();
-console.log("BODY:", body);
+      console.log("BODY:", body);
     } catch (err) {
-       console.error("JSON ERROR:", err);
+      console.error("JSON ERROR:", err);
       return NextResponse.json(
         { error: "Request body must be valid JSON" },
         { status: 400 }
       );
     }
-    
 
     const { email, password } = body;
 
@@ -62,7 +62,7 @@ console.log("BODY:", body);
       { expiresIn: "7d" }
     );
 
-    // 5️⃣ Set HTTP-only cookie
+    // 5️⃣ Response
     const response = NextResponse.json(
       {
         message: "Login successful",
@@ -75,18 +75,17 @@ console.log("BODY:", body);
       { status: 200 }
     );
 
+    // ✅ Set cookie (ONLY THIS METHOD)
     response.cookies.set("token", token, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    httpOnly: true,
-      secure: true,
-      sameSite: "lax",  
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // 🔥 important
+      sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;
+
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
