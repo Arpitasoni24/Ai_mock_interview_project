@@ -4,10 +4,10 @@ import { cookies } from "next/headers";
 
 export async function GET() {
   try {
-    // ✅ Get token using Next.js cookies API (correct way)
-    const token = cookies().get("token")?.value;
+    // ✅ FIX: await cookies()
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
-    // ❌ No token
     if (!token) {
       return NextResponse.json(
         { authenticated: false },
@@ -15,7 +15,6 @@ export async function GET() {
       );
     }
 
-    // ✅ Verify token
     jwt.verify(token, process.env.JWT_SECRET!);
 
     return NextResponse.json(
