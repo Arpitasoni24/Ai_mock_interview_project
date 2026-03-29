@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const pathname = request.nextUrl.pathname;
 
-  // Allow public routes
+  // ✅ Allow public routes
   if (
     pathname === "/" ||
     pathname.startsWith("/login") ||
@@ -15,24 +15,25 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect dashboard & interview
+  // ✅ Protect private routes
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/interview")
   ) {
+    // ❌ No token → redirect
     if (!token) {
-      return NextResponse.redirect(
-        new URL("/login", request.url)
-      );
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
     try {
-      jwt.verify(token, process.env.JWT_SECRET!);
+      // ✅ Verify token safely
+      jwt.verify(token, process.env.JWT_SECRET || "fallback_secret");
+
       return NextResponse.next();
-    } catch {
-      return NextResponse.redirect(
-        new URL("/login", request.url)
-      );
+    } catch (error) {
+      console.error("JWT ERROR:", error);
+
+      return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
@@ -40,8 +41,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/dashboard/:path*",
-    "/interview/:path*",
-  ],
+  matcher: ["/dashboard/:path*", "/interview/:path*"],
 };

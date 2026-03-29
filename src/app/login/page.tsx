@@ -3,11 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -17,32 +19,29 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      
       const res = await fetch("/api/auth/login", {
-        
         method: "POST",
-        credentials: "include",
+        credentials: "include", // ✅ important for cookies
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-    email: email.trim(),
-    password: password.trim(),
-    
-  }),
+          email: email.trim(),
+          password: password.trim(),
+        }),
       });
+
       console.log("STATUS:", res.status);
+
       const data = await res.json();
 
       if (!res.ok) {
-        console.log("LOGIN ERROR:", data); 
+        console.log("LOGIN ERROR:", data);
         setError(data.error || "Login failed");
         return;
       }
 
-//       setTimeout(() => {
-//   window.location.href = "/dashboard";
-// }, 100);
-      window.location.href = "/dashboard";
-      // router.push("/dashboard");
+      // ✅ FIXED: Use router instead of window reload
+      router.push("/dashboard");
+
     } catch (err) {
       console.error("FETCH ERROR:", err);
       setError("Something went wrong");
@@ -55,10 +54,11 @@ export default function LoginPage() {
     <div className="login-wrapper">
       <div className="login-card">
         <span className="logo">
-              <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
-              <span>InterviewGuide</span>
-            </span>
-            <br />
+          <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
+          <span>InterviewGuide</span>
+        </span>
+        <br />
+
         <h1 className="login-title">Welcome back</h1>
         <p className="login-subtitle">
           Practice interviews. Improve answers. Get confident.
