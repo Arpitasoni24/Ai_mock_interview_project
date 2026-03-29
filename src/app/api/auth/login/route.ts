@@ -1,33 +1,98 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
 
-export async function GET() {
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function POST(req: Request) {
   try {
-    // ✅ FIX: await cookies()
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+    let body;
 
-    if (!token) {
+    try {
+      body = await req.json();
+      console.log("BODY:", body);
+    } catch (err) {
+      console.error("JSON ERROR:", err);
       return NextResponse.json(
-        { authenticated: false },
+        { error: "Request body must be valid JSON" },
+        { status: 400 }
+      );
+    }
+
+    const { email, password } = body;
+
+    // 1️⃣ Validate
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // 2️⃣ Find user
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Invalid email or password" },
         { status: 401 }
       );
     }
 
-    jwt.verify(token, process.env.JWT_SECRET!);
+    // 3️⃣ Check password
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json(
-      { authenticated: true },
+    // 4️⃣ Create JWT
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "7d" }
+    );
+
+    console.log("TOKEN CREATED:", token);
+
+    // 5️⃣ Response
+    const response = NextResponse.json(
+      {
+        message: "Login successful",
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        },
+      },
       { status: 200 }
     );
 
-  } catch (error) {
-    console.error("Auth check error:", error);
+    // ✅ Set cookie (ONLY THIS METHOD)
+    response.cookies.set("token", token, {
+    httpOnly: true,
+    secure: true, // 🔥 FORCE TRUE (IMPORTANT)
+    sameSite: "none",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
 
+    return response;
+
+  } catch (error) {
+    console.error("Login error:", error);
     return NextResponse.json(
-      { authenticated: false },
-      { status: 401 }
+      { error: "Something went wrong" },
+      { status: 500 }
     );
   }
 }

@@ -397,6 +397,7 @@ const exportInterviewReport = (interview: Interview) => {
             marginTop: "8px",
            }}
           onClick={() => (window.location.href = "/interview")}
+          
         >
           Start New Interview
         </button>
@@ -682,3 +683,4 @@ const exportInterviewReport = (interview: Interview) => {
 );
 
 }
+
