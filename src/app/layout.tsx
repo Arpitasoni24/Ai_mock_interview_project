@@ -36,6 +36,7 @@ export default function RootLayout({
 
       </head>
       <body className={instrumentSans.className}>
+        <div className="global-bg"></div>
         {children}
       </body>
     </html>

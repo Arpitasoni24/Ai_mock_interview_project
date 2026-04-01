@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRef } from "react";
 
 declare global {
   interface Window {
@@ -9,30 +10,39 @@ declare global {
   }
 }
 const cardStyle = {
-  background: "#ffffff",
-  borderRadius: "12px",
-  padding: "20px",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+  background: "rgba(255,255,255,0.04)",
+  backdropFilter: "blur(16px)",
+  borderRadius: "18px",
+  padding: "24px",
+  border: "1px solid rgba(255,255,255,0.08)",
+  boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
 };
 
+
 const primaryBtn = {
-  backgroundColor: "#2563eb",
+  background: "linear-gradient(135deg, #7C3AED, #A855F7)",
   color: "#fff",
   border: "none",
-  padding: "10px 18px",
-  borderRadius: "8px",
+  padding: "12px 20px",
+  borderRadius: "12px",
   cursor: "pointer",
-  fontWeight: 500,
+  fontWeight: 600,
+  boxShadow: "0 0 25px rgba(124,58,237,0.4)",
+  transition: "0.3s ease",
 };
 
 const secondaryBtn = {
-  backgroundColor: "#0f172a",
-  color: "#fff",
-  border: "none",
-  padding: "8px 14px",
-  borderRadius: "8px",
+  background: "rgba(255,255,255,0.05)",
+  color: "#E5E7EB",
+  border: "1px solid rgba(255,255,255,0.1)",
+  padding: "10px 16px",
+  borderRadius: "12px",
   cursor: "pointer",
+  transition: "0.25s",
 };
+
+
+
 
 
 export default function InterviewPage() {
@@ -44,8 +54,10 @@ export default function InterviewPage() {
   // const [sessionId, setSessionId] = useState<string | null>(null);
   // const [sessionId, setSessionId] = useState<string | null>(null);
 
-
-
+const canvasRef = useRef<HTMLCanvasElement | null>(null);
+const audioContextRef = useRef<AudioContext | null>(null);
+const analyserRef = useRef<AnalyserNode | null>(null);
+const [audioLevel, setAudioLevel] = useState(0);
   // -------- INTERVIEW STATE --------
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -93,7 +105,7 @@ const [finalScores, setFinalScores] = useState<number[]>([]);
 
 const data = await res.json();
 
-      setQuestions(data.questions);
+      setQuestions(data.questions.slice(0, 5));
       setCurrentIndex(0);
       setAnswer("");
     } catch (err: any) {
@@ -150,25 +162,24 @@ const resumeInterview = () => {
     currentIndex === questions.length - 1;
 
   // -------- TIMER LOGIC --------
-  useEffect(() => {
-    if (questions.length === 0) return;
+ useEffect(() => {
+  if (questions.length === 0 || paused || completed) return;
 
-    setTimeLeft(QUESTION_TIME);
+  const timer = setInterval(() => {
+    setTimeLeft((prev) => {
+      if (prev <= 1) {
+        clearInterval(timer);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
+  return () => clearInterval(timer);
+}, [currentIndex, questions.length, paused, completed]);
 
-    return () => clearInterval(timer);
-  }, [currentIndex, questions.length, paused]);
-
-  useEffect(() => {
-  if (
-    timeLeft <= 0 &&
-    questions.length > 0 &&
-    !loading &&
-    !autoSubmitting
-  ) {
+useEffect(() => {
+  if (timeLeft === 0 && !loading && !autoSubmitting && !completed) {
     setAutoSubmitting(true);
     handleNext();
   }
@@ -192,6 +203,15 @@ useEffect(() => {
   loadVoices();
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }, []);
+useEffect(() => {
+  if (completed) {
+    confetti({
+      particleCount: 120,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
+  }
+}, [completed]);
 useEffect(() => {
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") {
@@ -230,9 +250,60 @@ useEffect(() => {
   checkAuth();
 }, []);
 
+const visualize = () => {
+  const analyser = analyserRef.current;
+  if (!analyser) return;
+
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  const update = () => {
+    requestAnimationFrame(update);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    // 🔥 get average volume
+    const avg =
+      dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+    setAudioLevel(avg);
+  };
+
+  update();
+};
+const [smoothedLevel, setSmoothedLevel] = useState(0);
+
+useEffect(() => {
+  const smoothing = setInterval(() => {
+    setSmoothedLevel((prev) => prev + (audioLevel - prev) * 0.2);
+  }, 50);
+
+  return () => clearInterval(smoothing);
+}, [audioLevel]);
+
+useEffect(() => {
+  if (domain.toLowerCase().includes("intern")) {
+    setLevel("junior");
+  } else if (domain.toLowerCase().includes("senior")) {
+    setLevel("senior");
+  }
+}, [domain]);
   // -------- VOICE INPUT --------
   const startListening = () => {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+  const audioContext = new AudioContext();
+  const analyser = audioContext.createAnalyser();
+
+  const source = audioContext.createMediaStreamSource(stream);
+  source.connect(analyser);
+
+  analyser.fftSize = 256;
+
+  audioContextRef.current = audioContext;
+  analyserRef.current = analyser;
+
+  visualize(); // 🔥 start animation
+
+  // existing recorder logic
   const recorder = new MediaRecorder(stream);
   const chunks: BlobPart[] = [];
 
@@ -244,7 +315,6 @@ useEffect(() => {
 
   recorder.start(1000);
   setMediaRecorder(recorder);
-  
 });
 
     const SpeechRecognition =
@@ -315,14 +385,16 @@ setFinalScores((prev) => [...prev, aiData.score]);
 
       if (isLastQuestion) {
   setCompleted(true);
+  return;
 } else {
   setTransitioning(true);
 
   setTimeout(() => {
-    setCurrentIndex((prev) => prev + 1);
-    setAnswer("");
-    setTransitioning(false);
-  }, 300);
+  setCurrentIndex((prev) => prev + 1);
+  setAnswer("");
+  setTimeLeft(QUESTION_TIME); // 🔥 ADD THIS
+  setTransitioning(false);
+}, 300);
 }
 
     } catch {
@@ -360,15 +432,9 @@ setFinalScores((prev) => [...prev, aiData.score]);
   </div>
 
   {questions.length > 0 && !completed && (
-    <div style={{
-      padding: "6px 12px",
-      borderRadius: "999px",
-      background: timeLeft <= 10 ? "#fee2e2" : "#e0f2fe",
-      color: timeLeft <= 10 ? "#b91c1c" : "#0369a1",
-      fontWeight: 600
-    }}>
-      ⏱ {timeLeft}s
-    </div>
+    <div className={`timer ${timeLeft <= 10 ? "danger" : ""}`}>
+  ⏱ {timeLeft}s
+</div>
   )}
 </div>
 
@@ -388,105 +454,129 @@ setFinalScores((prev) => [...prev, aiData.score]);
 
 
       {/* -------- DOMAIN INPUT -------- */}
-          {questions.length === 0 && (
-  <div style={{
-    ...cardStyle,
-    marginTop: "24px"
-  }}>
-    <h3 style={{ marginBottom: "8px" }}>
-      Interview Setup
-    </h3>
-    <p style={{ color: "#64748b", fontSize: "14px" }}>
-      Choose a role and difficulty to begin
-    </p>
+        {questions.length === 0 && (
+  <div className="setup-card">
 
-          <h3>Enter your interview domain</h3>
+    <div className="setup-header">
+      <h2>Interview Setup</h2>
+      <p className="muted">
+        Choose your role and difficulty to begin
+      </p>
+    </div>
 
-          <input
-            type="text"
-            placeholder="e.g. AI Engineer, Full Stack Developer, Data Scientist"
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
-            style={{ width: "100%", padding: "10px", marginTop: "10px" }}
-          />
+    <div className="setup-form">
 
-          <select
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            style={{ marginTop: "10px", padding: "8px" }}
-          >
-            <option value="junior">Junior</option>
-            <option value="mid">Mid</option>
-            <option value="senior">Senior</option>
-          </select>
+      {/* DOMAIN */}
+      <div className="form-group">
+        <label>Interview Domain</label>
+        <div className="quick-roles">
+  {["Frontend Developer", "Backend Developer", "AI Engineer", "Data Scientist"].map((role) => (
+    <button
+      key={role}
+      className="role-chip"
+      onClick={() => setDomain(role)}
+    >
+      {role}
+    </button>
+  ))}
+</div>
+        <input
+  type="text"
+  placeholder="Try: AI Engineer, Product Manager, SDE..."
+  value={domain}
+  onChange={(e) => setDomain(e.target.value)}
+  className="input-field"
+/>
+      </div>
 
-          <button
+      {/* LEVEL */}
+      <div className="form-group">
+  <label>Difficulty Level</label>
+
+  <select
+    value={level}
+    onChange={(e) => setLevel(e.target.value)}
+    className="select-field"
+  >
+    <option value="junior">Junior</option>
+    <option value="mid">Mid</option>
+    <option value="senior">Senior</option>
+  </select>
+
+  <p className="level-hint">
+    {level === "junior" && "Basic concepts and fundamentals"}
+    {level === "mid" && "Real-world problem solving"}
+    {level === "senior" && "System design & deep knowledge"}
+  </p>
+</div>
+
+      {/* BUTTON */}
+      <button
   onClick={generateQuestions}
-  disabled={loadingQuestions}
-  style={{
-    marginTop: "15px",
-    padding: "10px 20px",
-    opacity: loadingQuestions ? 0.6 : 1,
-    cursor: loadingQuestions ? "not-allowed" : "pointer",
-  }}
+  disabled={loadingQuestions || !domain}
+  className="primary-btn full-width"
 >
-  {loadingQuestions ? "Generating..." : "Start Interview"}
+  {loadingQuestions ? "Generating AI Questions..." : "Start Interview"}
 </button>
 
-{error && (
-  <p style={{ color: "red", marginTop: "10px" }}>
-    {error}
-  </p>
-  
-)}
-        </div>
+
+      {/* ERROR */}
+      {error && (
+        <p className="error-text">{error}</p>
       )}
-      {completed && (
-  <div
-    style={{
-      ...cardStyle,
-      marginTop: "40px",
-      textAlign: "center",
-      backgroundColor: darkMode ? "#020617" : "#ffffff",
-    }}
-  >
-    <h2 style={{ fontSize: "24px", fontWeight: 700 }}>
-  Interview Complete <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#17cf1a"><path d="M240-40v-329L110-580l185-300h370l185 300-130 211v329l-240-80-240 80Zm80-111 160-53 160 53v-129H320v129Zm20-649L204-580l136 220h280l136-220-136-220H340Zm98 383L296-558l57-57 85 85 169-170 57 56-226 227ZM320-280h320-320Z"/></svg>
-</h2>
 
-<p style={{ color: "#94a3b8", marginTop: "6px" }}>
-  You’ve completed a full AI-driven interview simulation.
-</p>
+    </div>
+  </div>
+)}
+    {completed && (
+  <div className="completion-card">
 
+    {/* HEADER */}
+    <div className="completion-header">
+      <div className="success-icon">✓</div>
 
-    <p style={{ marginTop: "10px", color: "#64748b" }}>
-      Great job! Here's a quick summary.
+      <h2>Interview Completed</h2>
+
+      <p className="muted">
+        You’ve successfully completed your AI mock interview
+      </p>
+    </div>
+
+    {/* SCORE */}
+    <div className="score-box">
+      <p className="score-label">Average Score</p>
+
+      <h1 className="score-value">
+        {(
+          finalScores.reduce((a, b) => a + b, 0) /
+          finalScores.length
+        ).toFixed(1)}
+        <span>/10</span>
+      </h1>
+    </div>
+
+    {/* MESSAGE */}
+    <p className="completion-subtext">
+      Great job! Keep practicing to improve consistency and confidence.
     </p>
 
-    <h3 style={{ marginTop: "20px" }}>
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFF55"><path d="M480-644v236l96 74-36-122 90-64H518l-38-124ZM233-120l93-304L80-600h304l96-320 96 320h304L634-424l93 304-247-188-247 188Z"/></svg> Average Score:{" "}
-      {(
-        finalScores.reduce((a, b) => a + b, 0) /
-        finalScores.length
-      ).toFixed(1)}
-      /10
-    </h3>
-
-    <div style={{ marginTop: "30px", display: "flex", gap: "12px", justifyContent: "center" }}>
+    {/* ACTIONS */}
+    <div className="completion-actions">
       <button
-        style={primaryBtn}
+        className="primary-btn"
         onClick={() => (window.location.href = "/dashboard")}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg> Go to Dashboard
+        📊 View Dashboard
       </button>
 
       <button
-        style={secondaryBtn}
+        className="secondary-btn"
         onClick={() => window.location.reload()}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240v80H200v560h560v-240h80v240q0 33-23.5 56.5T760-120H200Zm440-400v-120H520v-80h120v-120h80v120h120v80H720v120h-80Z"/></svg> Start New Interview
+        🔁 Try Again
       </button>
     </div>
+
   </div>
 )}
 
@@ -499,34 +589,18 @@ setFinalScores((prev) => [...prev, aiData.score]);
             <strong>{level}</strong> | Question{" "}
             {currentIndex + 1} of {questions.length}
           </p>
-<div style={{
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginTop: "24px"
-}}>
-  <div style={{ display: "flex", gap: "10px" }}>
-    <button onClick={pauseInterview} style={secondaryBtn}>
-    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M520-200v-560h240v560H520Zm-320 0v-560h240v560H200Zm400-80h80v-400h-80v400Zm-320 0h80v-400h-80v400Zm0-400v400-400Zm320 0v400-400Z"/></svg> Pause
-    </button>
+<div className="controls-bar">
 
-    <button onClick={resumeInterview} style={secondaryBtn}>
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M240-240v-480h80v480h-80Zm160 0 400-240-400-240v480Zm80-141v-198l165 99-165 99Zm0-99Z"/></svg> Resume
-    </button>
-
-    <button onClick={startListening} style={secondaryBtn}>
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm0-240Zm-40 520v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Zm40-360q17 0 28.5-11.5T520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480Z"/></svg>Speak
-    </button>
-    
+  <div className="controls-left">
+    <button onClick={pauseInterview} className="secondary-btn">⏸ Pause</button>
+    <button onClick={resumeInterview} className="secondary-btn">▶ Resume</button>
+    <button onClick={startListening} className="secondary-btn">🎤 Speak</button>
   </div>
 
   <button
     onClick={handleNext}
     disabled={loading}
-    style={{
-      ...primaryBtn,
-      opacity: loading ? 0.6 : 1
-    }}
+    className="primary-btn"
   >
     {loading
       ? "Evaluating..."
@@ -534,6 +608,7 @@ setFinalScores((prev) => [...prev, aiData.score]);
       ? "Finish Interview"
       : "Next Question"}
   </button>
+
 </div>
 
 
@@ -557,11 +632,7 @@ setFinalScores((prev) => [...prev, aiData.score]);
     className={`question-card ${
     transitioning ? "fade-out" : "fade-in"
   }`}
-    style={{
-      ...cardStyle,
-      backgroundColor: darkMode ? "#020617" : "#ffffff",
-      marginTop: "24px",
-    }}
+    
 >
   <p style={{
   fontSize: "13px",
@@ -585,25 +656,23 @@ setFinalScores((prev) => [...prev, aiData.score]);
   </button>
 </div>
 </div>
-
+{mediaRecorder && (
+  <div className="voice-orb-wrapper">
+    <div
+      className="voice-orb"
+      style={{
+        transform: `scale(${1 + smoothedLevel * 0.005})`
+      }}
+    />
+  </div>
+)}
 
 
         <textarea
   placeholder="Speak or type your answer here..."
   value={answer}
   onChange={(e) => setAnswer(e.target.value)}
-  style={{
-    width: "100%",
-    marginTop: "20px",
-    padding: "16px",
-    borderRadius: "12px",
-    border: "1px solid #e2e8f0",
-    fontSize: "15px",
-    lineHeight: "1.6",
-    resize: "vertical",
-    backgroundColor: darkMode ? "#020617" : "#ffffff",
-    color: darkMode ? "#ffffff" : "#000000",
-  }}
+  className="answer-box"
 />
 
 

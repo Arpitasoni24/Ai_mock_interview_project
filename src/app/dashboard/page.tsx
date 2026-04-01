@@ -187,22 +187,26 @@ const consistency = calculateConsistency(interviews, 7);
   const [expandedSession, setExpandedSession] = useState<string | null>(null);
 
 const [search, setSearch] = useState("");
+const [filterDomain, setFilterDomain] = useState("all");
+const [sortBy, setSortBy] = useState("latest");
 const [domainFilter, setDomainFilter] = useState("all");
 const [minScore, setMinScore] = useState(0);
-const filteredInterviews = interviews.filter((interview) => {
-  const matchesSearch = interview.question
-    .toLowerCase()
-    .includes(search.toLowerCase());
-
-  const matchesDomain =
-    domainFilter === "all" ||
-    interview.domain === domainFilter;
-
-  const matchesScore = interview.score >= minScore;
-
-  return matchesSearch && matchesDomain && matchesScore;
-});
-
+const filteredInterviews = interviews
+  .filter((i) =>
+    i.domain.toLowerCase().includes(search.toLowerCase())
+  )
+  .filter((i) =>
+    filterDomain === "all" ? true : i.domain === filterDomain
+  )
+  .sort((a, b) => {
+    if (sortBy === "latest") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (sortBy === "best") {
+      return b.score - a.score;
+    }
+    return 0;
+  });
   const analytics = calculateAnalytics(interviews);
   const { currentStreak, bestStreak } =
   calculateStreaks(interviews);
@@ -347,6 +351,10 @@ const exportInterviewReport = (interview: Interview) => {
     14,
     y
   );
+  // ------------------------------
+  const [search, setSearch] = useState("");
+const [filterDomain, setFilterDomain] = useState("all");
+const [sortBy, setSortBy] = useState("latest");
 
   // ---------- FOOTER ----------
   doc.setFont("helvetica", "normal");
@@ -362,18 +370,46 @@ const exportInterviewReport = (interview: Interview) => {
   doc.save(`Interview_Report_${interview.domain}.pdf`);
 };
 
+function generateInsight(analytics: any, interviews: any[]) {
+  if (!interviews.length) {
+    return "Start your first interview to unlock AI-powered insights.";
+  }
 
+  if (analytics.average >= 8) {
+    return "Excellent performance. You're consistently scoring high — focus on refining advanced answers.";
+  }
+
+  if (analytics.average >= 6) {
+    return "Good progress. Try improving clarity and structure in your responses to reach the next level.";
+  }
+
+  return "You're getting started. Focus on consistency and practicing daily to build confidence.";
+}
+function calculateLevelData(interviews: any[]) {
+  const totalXP = interviews.length * 20; // 20 XP per interview
+
+  const level = Math.floor(totalXP / 100) + 1;
+  const currentXP = totalXP % 100;
+  const nextLevelXP = 100;
+
+  return {
+    totalXP,
+    level,
+    currentXP,
+    nextLevelXP,
+  };
+}
+
+const levelData = calculateLevelData(interviews);
   return (
   <div className="bg">
     {/* Background rays */}
-    <div className="light-ray ray-1" />
-    <div className="light-ray ray-2" />
-    <div className="light-ray ray-3" />
+    
 
     <div className="content">
 
       {/* ================= HEADER ================= */}
-      <div
+      {/* <div
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -404,53 +440,57 @@ const exportInterviewReport = (interview: Interview) => {
         <button
           onClick={handleLogout}
           style={{
-            background: "#000000",
-            color: "white",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            border: "none",
-            cursor: "pointer",
-          }}
+  background: "rgba(255,255,255,0.05)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  color: "#E5E7EB",
+  padding: "10px 16px",
+  borderRadius: "10px",
+}}
         >
           Logout
         </button>
-      </div>
+      </div> */}
+      <div className="dashboard-header">
+  <div>
+    <h1>Interview Dashboard</h1>
+    <p className="muted">
+      Track your progress and AI-powered insights
+    </p>
+  </div>
+
+  <div className="header-actions">
+    <button
+      className="cta"
+      onClick={() => (window.location.href = "/interview")}
+    >
+      🚀 New Interview
+    </button>
+
+    <button className="logout-btn" onClick={handleLogout}>
+      Logout
+    </button>
+  </div>
+</div>
 
       {/* ================= TOP STATS ================= */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "32px",
-          alignItems: "center",
-          marginBottom: "40px",
-        }}
-      >
+      <div className="stats-container">
 
-        <div className="stats-layout"
-  style={{
-    marginBottom: "48px",
-  }}
->
-  {/* LEFT — SCORE RINGS */}
-  <div className="rings"
-  >
+  {/* LEFT — SCORE */}
+  <div className="stats-left">
     <CircularProgress value={analytics.average} label="Average Score" />
     <CircularProgress value={analytics.best} label="Best Score" />
   </div>
 
-  {/* RIGHT — PERFORMANCE GRAPH */}
-  <div className="glass-card graph" style={{ padding: "20px" }} >
-    <h3 style={{ marginBottom: "12px" }}>
-       Performance Trend
-    </h3>
+  {/* RIGHT — CHART */}
+  <div className="glass-card stats-chart">
+    <h3>Performance Trend</h3>
 
-    <p className="muted" style={{ fontSize: "13px", marginBottom: "16px" }}>
+    <p className="muted">
       Score progression across interviews
     </p>
 
-    <div style={{ height: "220px" , marginTop: "56px" ,}}>
-      <ResponsiveContainer width="100%" height="100%" >
+    <div className="chart-wrapper">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           <CartesianGrid
             strokeDasharray="3 3"
@@ -470,214 +510,313 @@ const exportInterviewReport = (interview: Interview) => {
           />
 
           <Tooltip
-            contentStyle={{
-              backgroundColor: "#020617",
-              borderRadius: "8px",
-              border: "1px solid #334155",
-              color: "#fff",
-            }}
-          />
+  cursor={{ stroke: "rgba(124,58,237,0.3)", strokeWidth: 2 }}
 
-          <Line
-            type="monotone"
-            dataKey="score"
-            stroke="#38bdf8"
-            strokeWidth={3}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-      <p className="muted" style={{ marginTop: "12px", fontSize: "13px" }}>
-  Performance trends help identify consistency and growth patterns.
-</p>
-      <p className="muted" style={{ marginTop: "4px", fontSize: "13px" }}>
-  Use AI feedback to refine clarity, structure, and confidence.
-</p>
+  contentStyle={{
+    background: "rgba(15, 10, 40, 0.6)",
+    backdropFilter: "blur(16px)",
+    borderRadius: "12px",
+    border: "1px solid rgba(124,58,237,0.3)",
+    color: "#E5E7EB",
+    boxShadow: "0 10px 40px rgba(124,58,237,0.25)",
+  }}
 
-    </div>
-  </div>
-</div>
+  labelStyle={{
+    color: "#A855F7",
+    fontWeight: 600,
+    marginBottom: "4px",
+  }}
 
-
-        
-      </div>
-
-      {/* ================= STREAK + CONSISTENCY ================= */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: "24px",
-          marginBottom: "48px",
-        }}
-      >
-        <div className="glass-card">
-          <h3>🔥 Current Streak</h3>
-          <p style={{ fontSize: "32px", fontWeight: 700 }}>
-            {currentStreak} days
-          </p>
-          <p className="muted">Consecutive active days</p>
-        </div>
-
-        <div className="glass-card">
-          <h3>🏆 Best Streak</h3>
-          <p style={{ fontSize: "32px", fontWeight: 700 }}>
-            {bestStreak} days
-          </p>
-          <p className="muted">Your longest streak</p>
-        </div>
-
-        <div className="glass-card">
-          <h3>📆 Weekly Consistency</h3>
-          <p style={{ fontSize: "28px", fontWeight: 700 }}>
-            {consistency}%
-          </p>
-          <p className="muted">Last 7 days</p>
-        </div>
-      </div>
-
-      {/* ================= ACHIEVEMENTS ================= */}
-      <div style={{ marginBottom: "56px" }}>
-        <h2 style={{ marginBottom: "16px" }}>Achievements</h2>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: "16px",
-          }}
-        >
-          {BADGES.map((badge) => {
-            const unlocked = badge.unlocked(badgeData);
-
-            return (
-              <div
-                key={badge.id}
-                className="glass-card"
-                style={{
-                  textAlign: "center",
-                  opacity: unlocked ? 1 : 0.4,
-                  cursor: "default",
-                  transform: unlocked ? "none" : "scale(0.95)",
-                }}
-
-              >
-                <img
-  src={badge.image}
-  alt={badge.title}
-  style={{
-    width: "64px",
-    height: "64px",
-    objectFit: "contain",
-    marginBottom: "8px",
-    filter: unlocked ? "none" : "grayscale(100%)",
-    opacity: unlocked ? 1 : 0.4,
-    transition: "all 0.3s ease",
+  itemStyle={{
+    color: "#F1F5F9",
+    fontSize: "13px",
   }}
 />
 
+          <Line
+  type="monotone"
+  dataKey="score"
+  stroke="#A855F7"
+  strokeWidth={3}
+  dot={{ r: 4 }}
+  activeDot={{
+    r: 8,
+    stroke: "#fff",
+    strokeWidth: 2,
+    fill: "#A855F7"
+  }}
+/>
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
 
-{/* <p className="muted" style={{ fontSize: "12px" }}>
-  {unlocked ? "Unlocked" : "Locked"}
-</p> */}
+    <p className="muted small-text">
+      Performance trends help identify consistency and growth patterns.
+    </p>
 
-                <p style={{ fontWeight: 600 }}>{badge.title}</p>
-                <p className="muted" style={{ fontSize: "12px" }}>
-                  {unlocked ? "Unlocked" : "Locked"}
-                </p>
-              </div>
-            );
-          })}
+    <p className="muted small-text">
+      Use AI feedback to refine clarity, structure, and confidence.
+    </p>
+  </div>
+
+</div>
+
+      {/* ================= STREAK + CONSISTENCY ================= */}
+      <div className="streak-grid">
+
+  <div className="streak-card purple">
+    <div className="card-top">
+      <span className="card-icon">🔥</span>
+      <h3>Current Streak</h3>
+    </div>
+
+    <p className="streak-value">{currentStreak} days</p>
+    <p className="muted">Consecutive active days</p>
+  </div>
+
+  <div className="streak-card gold">
+    <div className="card-top">
+      <span className="card-icon">🏆</span>
+      <h3>Best Streak</h3>
+    </div>
+
+    <p className="streak-value">{bestStreak} days</p>
+    <p className="muted">Your longest streak</p>
+  </div>
+
+  <div className="streak-card cyan">
+    <div className="card-top">
+      <span className="card-icon">📆</span>
+      <h3>Weekly Consistency</h3>
+    </div>
+
+    <p className="streak-value">{consistency}%</p>
+
+    {/* 🔥 PROGRESS BAR */}
+    <div className="progress-bar">
+      <div
+        className="progress-fill"
+        style={{ width: `${consistency}%` }}
+      />
+    </div>
+
+    <p className="muted">Last 7 days</p>
+  </div>
+
+</div>
+
+{/* =======AI INSIGHT================ */}
+<div className="ai-insights glass-card">
+
+  <div className="ai-header">
+    <span className="ai-icon">🧠</span>
+    <h3>AI Insights</h3>
+  </div>
+
+  <p className="ai-text">
+    {generateInsight(analytics, interviews)}
+  </p>
+
+  <div className="ai-tags">
+    <span>Clarity</span>
+    <span>Confidence</span>
+    <span>Consistency</span>
+  </div>
+
+</div>
+
+{/* =============XP================== */}
+<div className="level-card">
+
+  <div className="level-header">
+    <h3>🎯 Level {levelData.level}</h3>
+    <span className="xp-text">
+      {levelData.currentXP} / {levelData.nextLevelXP} XP
+    </span>
+  </div>
+
+  {/* Progress bar */}
+  <div className="level-bar">
+    <div
+      className="level-fill"
+      style={{ width: `${levelData.currentXP}%` }}
+    />
+  </div>
+
+  <p className="muted small-text">
+    Complete interviews to gain XP and level up
+  </p>
+
+</div>
+      {/* ================= ACHIEVEMENTS ================= */}
+      <div className="achievements-section">
+
+  <h2 className="section-title">Achievements</h2>
+
+  <div className="badges-grid">
+    {BADGES.map((badge) => {
+      const unlocked = badge.unlocked(badgeData);
+
+      return (
+        <div
+          key={badge.id}
+          className={`badge-card ${unlocked ? "unlocked" : "locked"}`}
+        >
+          <div className="badge-image-wrapper">
+            <img
+              src={badge.image}
+              alt={badge.title}
+              className="badge-image"
+            />
+          </div>
+
+          <p className="badge-title">{badge.title}</p>
+
+          <p className="badge-status">
+            {unlocked ? "Unlocked" : "Locked"}
+          </p>
         </div>
-      </div>
+      );
+    })}
+  </div>
 
+</div>
+
+{/* ====================================== */}
+<div className="filters-bar">
+
+  {/* SEARCH */}
+  <input
+    type="text"
+    placeholder="Search domain..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="filter-input"
+  />
+
+  {/* DOMAIN FILTER */}
+  <select
+    value={filterDomain}
+    onChange={(e) => setFilterDomain(e.target.value)}
+    className="filter-select"
+  >
+    <option value="all">All Domains</option>
+    {[...new Set(interviews.map((i) => i.domain))].map((d) => (
+      <option key={d} value={d}>
+        {d}
+      </option>
+    ))}
+  </select>
+
+  {/* SORT */}
+  <select
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+    className="filter-select"
+  >
+    <option value="latest">Latest</option>
+    <option value="best">Best Score</option>
+  </select>
+
+</div>
       {/* ================= PAST INTERVIEWS ================= */}
-      <div>
-        <h2 style={{ marginBottom: "16px" }}> Past Interviews</h2>
+      <div className="interviews-section">
 
-        {filteredInterviews.map((interview) => (
-          <div
-            key={interview.id}
-            className="glass-card"
-            style={{ marginBottom: "14px", cursor: "pointer" }}
-            onClick={() =>
-              setExpandedId(
-                expandedId === interview.id ? null : interview.id
-              )
-            }
-          >
-            <div style={{ display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap" }}>
-              <MiniScoreRing score={interview.score} />
+  <h2 className="section-title">Past Interviews</h2>
 
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 600 }}>{interview.domain}</p>
-                <p className="muted" style={{ fontSize: "13px" }}>
-                  {new Date(interview.createdAt).toLocaleDateString()}
-                </p>
-              </div>
+  {filteredInterviews.map((interview) => {
+    const isOpen = expandedId === interview.id;
+    const fb = JSON.parse(interview.feedback || "{}");
 
-              <span>{expandedId === interview.id ? "▲" : "▼"}</span>
+    return (
+      <div
+        key={interview.id}
+        className={`interview-card ${isOpen ? "open" : ""}`}
+        onClick={() =>
+          setExpandedId(isOpen ? null : interview.id)
+        }
+      >
+        {/* HEADER */}
+        <div className="interview-header">
+
+          <MiniScoreRing score={interview.score} />
+
+          <div className="interview-info">
+            <p className="interview-domain">{interview.domain}</p>
+            <p className="muted small-text">
+              {new Date(interview.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+
+          <span className="toggle-icon">
+            {isOpen ? "▲" : "▼"}
+          </span>
+        </div>
+
+        {/* EXPANDED CONTENT */}
+        {isOpen && (
+          <div className="interview-details">
+
+            <div className="qa-block">
+              <strong>Question</strong>
+              <p>{interview.question}</p>
             </div>
 
-            {expandedId === interview.id && (() => {
-  const fb = JSON.parse(interview.feedback || "{}");
+            <div className="qa-block">
+              <strong>Your Answer</strong>
+              <p>{interview.answer}</p>
+            </div>
 
-  return (
-    <div style={{ marginTop: "16px" }}>
-      <p><strong>Question:</strong> {interview.question}</p>
+            <div className="feedback-grid">
 
-      <p style={{ marginTop: "8px" }}>
-        <strong>Your Answer:</strong> {interview.answer}
-      </p>
+              <div className="feedback-card good">
+                <strong>Strengths</strong>
+                <ul>
+                  {fb.strengths?.map((s: string, i: number) => (
+                    <li key={i}>{s}</li>
+                  ))}
+                </ul>
+              </div>
 
-      <p style={{ marginTop: "12px" }}>
-        <strong>Strengths:</strong>
-      </p>
-      <ul>
-        {fb.strengths?.map((s: string, i: number) => (
-          <li key={i}>{s}</li>
-        ))}
-      </ul>
+              <div className="feedback-card bad">
+                <strong>Weaknesses</strong>
+                <ul>
+                  {fb.weaknesses?.map((w: string, i: number) => (
+                    <li key={i}>{w}</li>
+                  ))}
+                </ul>
+              </div>
 
-      <p>
-        <strong>Weaknesses:</strong>
-      </p>
-      <ul>
-        {fb.weaknesses?.map((w: string, i: number) => (
-          <li key={i}>{w}</li>
-        ))}
-      </ul>
+            </div>
 
-      <p>
-        <strong>Improved Answer:</strong>
-      </p>
-      <p>{fb.improvedAnswer}</p>
+            <div className="qa-block improved">
+              <strong>Improved Answer</strong>
+              <p>{fb.improvedAnswer}</p>
+            </div>
 
-      <button
-        style={{
-          marginTop: "12px",
-          padding: "8px 14px",
-          borderRadius: "6px",
-          background: "#0f172a",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          exportInterviewReport(interview);
-        }}
-      >
-        📄 Export PDF
-      </button>
-    </div>
-  );
-})()}
+            <button
+              className="export-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                exportInterviewReport(interview);
+              }}
+            >
+              📄 Export PDF
+            </button>
 
           </div>
-        ))}
+        )}
       </div>
+    );
+  })}
+  {filteredInterviews.length === 0 && (
+  <div className="empty-state">
+    <h3>No interviews found</h3>
+    <p>Try adjusting your filters</p>
+  </div>
+)}
+
+</div>
     </div>
   </div>
 );

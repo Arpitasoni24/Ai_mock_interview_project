@@ -5,6 +5,7 @@ import {useRouter} from "next/navigation";
 import { useState } from "react";
 import Image from 'next/image';
 
+
 export default function HomePage() {
  
   // Always start at top
@@ -57,9 +58,7 @@ export default function HomePage() {
     <div className="page-root">
       {/* ===== BACKGROUND ONLY ===== */}
       <div className="global-bg">
-        <div className="light-ray ray-1" data-speed="0.4" />
-        <div className="light-ray ray-2" data-speed="0.6" />
-        <div className="light-ray ray-3" data-speed="0.8" />
+        
       </div>
 <head>
   <title>InterviewGuide</title>
@@ -90,8 +89,8 @@ export default function HomePage() {
   </div>
 
   {/* RIGHT */}
-  <div className="nav-right">
-    <button onClick={handleStartInterview} className="cta">
+  <div className="hero-actions">
+    <button onClick={handleStartInterview} className="nav-btn primary">
       Start Mock Interview
     </button>
 
@@ -140,7 +139,7 @@ export default function HomePage() {
             Practice real interview questions, speak your answers, and get
             structured AI feedback — just like a real interviewer.
           </p>
-          <div className="nav-right">
+          <div className="hero-actions">
             <button
               className="nav-btn ghost"
               onClick={() => (location.href = "/login")}
@@ -155,144 +154,269 @@ export default function HomePage() {
             </button>
           </div>
         </section>
+        <div className="section-divider" />
 
         {/* ABOUT */}
-        <section className="section" id="about">
-          <h2>What is AI Mock Interview?</h2>
-          <p className="section-subtext">
-            A realistic interview simulation platform that helps you practice
-            interviews using voice, time limits, and AI-driven feedback.
-          </p>
+        <section className="about-section" id="about">
 
-          <div className="card-grid">
-            <div className="glass-card feature-card">
-  <Image
-    src="/images/voice.png"
-    alt="Voice based interview"
-    width={120}
-    height={120}
-    className="feature-image"
-  />
-  <h3>Voice-Based Interviews</h3>
-  <p>Answer questions by speaking — just like a real interview.</p>
-</div>
+  <div className="about-header">
+    <h2 className="gradient-heading">
+      What is AI Mock Interview?
+    </h2>
 
-            <div className="glass-card feature-card">
-  <Image src="/images/ai.png" alt="AI Interviewer" width={120} height={120} />
-  <h3>AI Interviewer</h3>
-  <p>Questions adapt to your role and experience.</p>
-</div>
-            <div className="glass-card feature-card">
-  <Image src="/images/performance.png" alt="Performance Tracking" width={120} height={120} />
-              <h3>Performance Tracking</h3>
-              <p>Track scores, strengths, and improvement.</p>
-            </div>
-          </div>
-        </section>
+    <p className="section-subtext">
+      A realistic interview simulation platform designed to help you
+      practice with voice, time limits, and AI-powered feedback.
+    </p>
+  </div>
+
+  <div className="features-grid">
+
+    <div className="feature-card">
+      <div className="feature-image-wrapper">
+        <Image
+          src="/images/voice.png"
+          alt="Voice based interview"
+          width={100}
+          height={100}
+        />
+      </div>
+      <h3>Voice-Based Interviews</h3>
+      <p>Answer questions naturally by speaking — just like real interviews.</p>
+    </div>
+
+    <div className="feature-card">
+      <div className="feature-image-wrapper">
+        <Image
+          src="/images/ai.png"
+          alt="AI Interviewer"
+          width={100}
+          height={100}
+        />
+      </div>
+      <h3>AI Interviewer</h3>
+      <p>Smart questions tailored to your role and experience level.</p>
+    </div>
+
+    <div className="feature-card">
+      <div className="feature-image-wrapper">
+        <Image
+          src="/images/performance.png"
+          alt="Performance Tracking"
+          width={100}
+          height={100}
+        />
+      </div>
+      <h3>Performance Tracking</h3>
+      <p>Track your progress with detailed analytics and insights.</p>
+    </div>
+
+  </div>
+
+</section>
+        <div className="section-divider" />
+<section className="split-highlight">
+
+  {/* LEFT */}
+  <div className="split-left">
+    <h2 className="gradient-heading">
+      Practice Like It’s Real
+    </h2>
+
+    <p className="split-text">
+      Experience timed interviews, voice responses, and real-time AI
+      evaluation — just like a real interview environment.
+    </p>
+
+    <div className="split-points">
+      <span>⏱ Timed Sessions</span>
+      <span>🎤 Voice Input</span>
+      <span>🤖 AI Feedback</span>
+    </div>
+  </div>
+
+  {/* RIGHT */}
+  <div className="split-right">
+
+    <div className="voice-card">
+
+      <div className="voice-header">
+        <span className="voice-dot" />
+        <p>AI Listening...</p>
+      </div>
+
+      {/* ORB */}
+      <div className="voice-orb-ui" />
+
+      {/* WAVE LINE */}
+      <div className="pulse-line" />
+
+    </div>
+
+  </div>
+
+</section>
+
+<div className="section-divider" />
 
         {/* HOW IT WORKS */}
-        <section className="section" id="how">
-          <h2>How It Works</h2>
+        
 
-          <div className="card-grid">
-            <div className="glass-card feature-card">
-              <Image src="/images/domain.png" alt="Choose domain" width={120} height={120} />
-              <h3>Choose Domain</h3>
-              <p>Any role — Frontend, Backend, AI, Full Stack, DevOps.</p>
-            </div>
-            <div className="glass-card feature-card">
-              <Image src="/images/answer.png" alt="Answer questions" width={120} height={120} />
-              <h3>Answer Questions</h3>
-              <p>Speak or type while the AI tracks timing.</p>
-            </div>
-            <div className="glass-card feature-card">
-              <Image src="/images/feedback.png" alt="Get Feedback" width={120} height={120} />
-              <h3>Get Feedback</h3>
-              <p>Receive score, strengths, and improvements.</p>
-            </div>
-          </div>
-        </section>
+        <section className="how-section" id="how">
+
+  <div className="how-header">
+    <h2>How It Works</h2>
+    <p className="muted">
+      A simple 3-step process to level up your interview skills
+    </p>
+  </div>
+
+  <div className="timeline-modern">
+
+    <div className="step-card">
+      <div className="step-number">01</div>
+      <h3>Choose Domain</h3>
+      <p>Select your role and difficulty level</p>
+    </div>
+
+    <div className="step-card">
+      <div className="step-number">02</div>
+      <h3>Answer Questions</h3>
+      <p>Speak or type your responses in real-time</p>
+    </div>
+
+    <div className="step-card">
+      <div className="step-number">03</div>
+      <h3>Get Feedback</h3>
+      <p>AI analyzes and improves your answers</p>
+    </div>
+
+  </div>
+
+</section>
+
+<div className="section-divider" />
 
         {/* FEATURES */}
-        <section className="section" id="features">
-          <h2>Why It’s Powerful</h2>
+       <section className="features-section" id="features">
 
-          <div className="card-grid">
-            <div className="glass-card feature-card">
-              <img src="/images/domainlimitless.png" alt="Unlimited Domains" width={120} height={120} />
-              <h3>Unlimited Domains</h3>
-              <p>No fixed categories — interview for any role.</p>
-            </div>
-            <div className="glass-card feature-card">
-              <img src="/images/nolimit.png" alt="Real AI Evaluation" width={120} height={120} />
-              <h3>Real AI Evaluation</h3>
-              <p>Feedback is based on your actual answers.</p>
-            </div>
-            <div className="glass-card feature-card">
-              <img src="/images/progress.png" alt="Progress Visualization" width={120} height={120}  />
-              <h3>Progress Visualization</h3>
-              <p>See improvement across interviews.</p>
-            </div>
-          </div>
-        </section>
+  <div className="features-header">
+    <h2 className="gradient-heading">
+      Why It’s Powerful
+    </h2>
+
+    <p className="section-subtext">
+      Built to simulate real interviews with intelligence, flexibility, and deep insights.
+    </p>
+  </div>
+
+  <div className="features-grid">
+
+    <div className="feature-card highlight">
+      <div className="feature-image-wrapper">
+        <img src="/images/domainlimitless.png" alt="Unlimited Domains" />
+      </div>
+      <h3>Unlimited Domains</h3>
+      <p>No fixed categories — practice for any role, from tech to management.</p>
+    </div>
+
+    <div className="feature-card highlight">
+      <div className="feature-image-wrapper">
+        <img src="/images/nolimit.png" alt="Real AI Evaluation" />
+      </div>
+      <h3>Real AI Evaluation</h3>
+      <p>AI analyzes your actual responses, not templates or keywords.</p>
+    </div>
+
+    <div className="feature-card highlight">
+      <div className="feature-image-wrapper">
+        <img src="/images/progress.png" alt="Progress Visualization" />
+      </div>
+      <h3>Progress Visualization</h3>
+      <p>Track your growth with analytics, trends, and performance insights.</p>
+    </div>
+
+  </div>
+
+</section>
+
+        <div className="section-divider" />
 
         {/* FINAL CTA */}
         <section className="final-cta">
-          <h2>Ready to crack your next interview?</h2>
-          <p>Practice smarter. Speak confidently. Improve faster.</p>
-          <button className="cta-bottom" onClick={() => (location.href = "/signup")}>
-            Create Free Account
-          </button>
-        </section>
+
+  <div className="cta-content">
+
+    <h2 className="cta-heading">
+      Ready to crack your next interview?
+    </h2>
+
+    <p className="cta-subtext">
+      Practice smarter. Speak confidently. Improve faster.
+    </p>
+
+    <button
+      className="cta-primary"
+      onClick={() => (location.href = "/signup")}
+    >
+       Create Free Account
+    </button>
+
+  </div>
+
+</section>
 
         {/* FOOTER */}
         <footer className="footer">
-          <div className="footer-inner">
-            <div className="footer-brand">
-              <span>
-              <Image src="/images/logo.png" alt="Logo" width={40} height={40} />
-                InterviewGuide</span>
-              <p>
-                Practice interviews. Get real feedback.
-                <br />
-                Build confidence before placements.
-              </p>
-            </div>
 
-            <div className="footer-links">
-              <div style={{paddingBottom: '4px'}}>
-                <h4>Product</h4>
-                <button onClick={() => scrollTo("features")} className="nav-link">Features</button>
-                <br /> <br />
-                <button onClick={() => scrollTo("how")} className="nav-link">How It Works</button>
-                <br /> <br />
-                <button className="nav-link" onClick={() => scrollTo("about")}>
-              About
-            </button>
-              </div>
+  <div className="footer-inner">
 
+    {/* BRAND */}
+    <div className="footer-brand">
+      <div className="footer-logo">
+        <Image src="/images/logo.png" alt="Logo" width={36} height={36} />
+        <span>InterviewGuide</span>
+      </div>
 
-              <div>
-                <h4>Get Started</h4>
-                <a href="/login">Login</a>
-                <br />
-                <a href="/signup">Signup</a>
-                <br />
-                <a href="/dashboard">Dashboard</a>
-              </div>
-              <div>
-                <h4>Contact</h4>
-                <p>soniarpita954@gmail.com</p>
-                <br />
-                <p>https://github.com/Arpitasoni24</p>
-              </div>
-            </div>
-          </div>
+      <p>
+        Practice interviews. Get real feedback.
+        <br />
+        Build confidence before placements.
+      </p>
+    </div>
 
-          <div className="footer-bottom">
-            © {new Date().getFullYear()} AI Interview. All rights reserved.
-          </div>
-        </footer>
+    {/* LINKS */}
+    <div className="footer-links">
+
+      <div>
+        <h4>Product</h4>
+        <button onClick={() => scrollTo("features")} className="footer-link">Features</button>
+        <button onClick={() => scrollTo("how")} className="footer-link">How It Works</button>
+        <button onClick={() => scrollTo("about")} className="footer-link">About</button>
+      </div>
+
+      <div>
+        <h4>Get Started</h4>
+        <a href="/login">Login</a>
+        <a href="/signup">Signup</a>
+        <a href="/dashboard">Dashboard</a>
+      </div>
+
+      <div>
+        <h4>Contact</h4>
+        <a href="mailto:soniarpita954@gmail.com">Email</a>
+        <a href="https://github.com/Arpitasoni24" target="_blank">GitHub</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div className="footer-bottom">
+    © {new Date().getFullYear()} InterviewGuide. All rights reserved.
+  </div>
+
+</footer>
       </main>
     </div>
   );
