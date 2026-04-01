@@ -203,15 +203,7 @@ useEffect(() => {
   loadVoices();
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }, []);
-useEffect(() => {
-  if (completed) {
-    confetti({
-      particleCount: 120,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-  }
-}, [completed]);
+
 useEffect(() => {
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") {
