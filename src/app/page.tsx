@@ -230,8 +230,8 @@ export default function HomePage() {
 
     <div className="split-points">
       <span>⏱ Timed Sessions</span>
-      <span>🎤 Voice Input</span>
-      <span>🤖 AI Feedback</span>
+      <span> Voice Input</span>
+      <span> AI Feedback</span>
     </div>
   </div>
 
