@@ -1927,6 +1927,11 @@ p {
   margin-bottom: 60px;
   align-items: stretch;
 }
+@media (max-width: 768px) {
+  .stats-container {
+    grid-template-columns: 1fr;   /* stack */
+  }
+}
 
 /* LEFT SIDE */
 .stats-left {
@@ -1935,6 +1940,20 @@ p {
   gap: 24px;
   align-items: center;
   justify-content: center;
+}
+
+/* 🔥 MOBILE MAGIC */
+@media (max-width: 768px) {
+  .stats-left {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .stats-left > * {
+    flex: 1;
+  }
 }
 
 /* RIGHT SIDE */

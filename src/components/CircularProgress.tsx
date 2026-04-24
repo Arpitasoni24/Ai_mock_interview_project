@@ -24,12 +24,14 @@ export default function CircularProgress({ value, label }: Props) {
   return (
     <div
       style={{
-        width: "200px",
-        textAlign: "center",
+        width: "100%",
+  maxWidth: "200px",
+  margin: "0 auto"
+        
       }}
       className="glass-card"
     >
-      <svg width="140" height="140">
+      <svg  width="100%" height="100%" viewBox="0 0 140 140">
         <defs>
           <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#22c55e" />
@@ -78,9 +80,11 @@ export default function CircularProgress({ value, label }: Props) {
       {/* Center text */}
       <div
         style={{
-          marginTop: "-90px",
-          fontSize: "26px",
-          fontWeight: 700,
+           position: "relative",
+            textAlign: "center",
+          marginTop: "-100px",
+          fontSize: "22px",
+            fontWeight: 700,
         }}
       >
         {value.toFixed(1)}
@@ -91,7 +95,7 @@ export default function CircularProgress({ value, label }: Props) {
 
       <p
         className="muted"
-        style={{ marginTop: "52px", fontSize: "14px" }}
+        style={{ marginTop: "58px", fontSize: "14px", textAlign: "center" }}
       >
         {label}
       </p>
