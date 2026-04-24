@@ -87,22 +87,3 @@ Each interview answer is:
 4. Displayed in the dashboard with analytics
 
 ---
-
-## Project Structure
-
-src/
-├─ app/
-│ ├─ page.tsx # Homepage
-│ ├─ interview/ # Interview flow
-│ ├─ dashboard/ # Analytics dashboard
-│ ├─ api/
-│ │ ├─ ai/ # AI evaluation & question generation
-│ │ ├─ interview/ # Interview storage
-│ │ └─ auth/ # Authentication
-├─ components/
-│ ├─ CircularProgress
-│ ├─ MiniScoreRing
-│ └─ UI components
-├─ lib/
-│ └─ prisma.ts
-└─ styles/
